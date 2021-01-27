@@ -47,8 +47,7 @@ function connectToServer() {
 
         socket.on("AnotherBalloonLaunched", function (data) {            
             var tank = enemies[data.id];
-            isBPressed = true;
-            tank.fire();      
+            tank.enemyFire();      
         });
 
     });
@@ -240,6 +239,33 @@ function createTank(scene, data) {
         tank.state.rY = tank.rotation.y;
         tank.state.rZ = tank.rotation.z;
         socket.emit("ILaunchedBalloon", tank.state);
+    }
+    
+    tank.enemyFire = function()
+    {
+        var tank = this;
+        //if (!isBPressed) return;
+        //if (!tank.canFire) return;
+        //tank.canFire = false;
+
+        //setTimeout(function () {
+            //tank.canFire = true;
+        //}, 500);
+
+        var cannonBall = new BABYLON.Mesh.CreateSphere("cannonBall", 32, 2, scene);
+        cannonBall.material = new BABYLON.StandardMaterial("Fire", scene);
+        cannonBall.material.diffuseTexture = new BABYLON.Texture("images/normal_map.jpg", scene);
+        var pos = tank.position;
+        cannonBall.position = new BABYLON.Vector3(pos.x, pos.y + 1, pos.z);
+        cannonBall.position.addInPlace(tank.frontVector.multiplyByFloats(5, 5, 5));
+        cannonBall.physicsImpostor = new BABYLON.PhysicsImpostor(cannonBall, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1 }, scene);
+        var fVector = tank.frontVector;
+        var force = new BABYLON.Vector3(fVector.x * 100 , (fVector.y+ .1) * 100 , fVector.z * 100);
+        cannonBall.physicsImpostor.applyImpulse(force, cannonBall.getAbsolutePosition());
+
+        setTimeout(function () {            
+            cannonBall.dispose();
+        }, 3000);
     }
     return tank;
 }
