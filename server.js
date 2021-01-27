@@ -23,6 +23,7 @@ io.on("connection", function (socket) {
     socket.on("ThankYou", function () {
         console.log("The client with ID " + socket.id + " Sent me a thankyou ");
     });
+	
     socket.on("IWasCreated", function (data) {
         
         if (data.id != socket.id) { 
