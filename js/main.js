@@ -22,7 +22,6 @@ function connectToServer() {
         socket.on("GetYourID", function (data) {
             Game.id = data.id;
             startGame();
-
             socket.emit("ThankYou", {});
         });
 
@@ -32,8 +31,7 @@ function connectToServer() {
 
         socket.on("AnotherTankMoved", function (data) {
             var tank = enemies[data.id];
-            tank.setState(data);
-        
+            tank.setState(data);        
         });
 
         window.onbeforeunload = function () {
@@ -41,12 +39,16 @@ function connectToServer() {
             socket.disconnect();
         }
 
-        socket.on("AnotherWentAway", function (data) {
-            
+        socket.on("AnotherWentAway", function (data) {            
             var tank = enemies[data.id];
             tank.dispose();
-            delete enemies[data.id];
-        
+            delete enemies[data.id];        
+        });
+
+        socket.on("AnotherBalloonLaunched", function (data) {            
+            var tank = enemies[data.id];
+            isBPressed = true;
+            tank.fire();      
         });
 
     });
@@ -195,7 +197,7 @@ function createTank(scene, data) {
     
         if (notifyServer) {
             tank.state.x = tank.position.x;
-                tank.state.y = tank.position.y;
+            tank.state.y = tank.position.y;
             tank.state.z = tank.position.z;
             tank.state.rX = tank.rotation.x;
             tank.state.rY = tank.rotation.y;
@@ -230,6 +232,14 @@ function createTank(scene, data) {
         setTimeout(function () {            
             cannonBall.dispose();
         }, 3000);
+        
+        tank.state.x = tank.position.x;
+        tank.state.y = tank.position.y;
+        tank.state.z = tank.position.z;
+        tank.state.rX = tank.rotation.x;
+        tank.state.rY = tank.rotation.y;
+        tank.state.rZ = tank.rotation.z;
+        socket.emit("ILaunchedBalloon", tank.state);
     }
     return tank;
 }
