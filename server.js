@@ -1,23 +1,17 @@
-
 var express = require('express');
 var socket = require('socket.io');
-
-
 var app = express();
-
 app.use("/", express.static(__dirname));
+
 app.get("/", function(req, res)
 {
 	res.sendFile("index.html");
 });
 
-
-
 var server = app.listen(process.env.PORT || 3000, function () {
     console.log("server just started listening on port 3000 ....");
 
-});//localhost:3000
-
+});
 
 var io = socket(server);
 io.set('transports', ['websocket']);
@@ -28,9 +22,7 @@ io.on("connection", function (socket) {
     socket.emit("GetYourID", { id : socket.id });
     socket.on("ThankYou", function () {
         console.log("The client with ID " + socket.id + " Sent me a thankyou ");
-
     });
-
     socket.on("IWasCreated", function (data) {
         
         if (data.id != socket.id) { 
@@ -43,14 +35,11 @@ io.on("connection", function (socket) {
             if (key == socket.id) continue;
             socket.emit("AnotherTankCreated", tanks[key]);
         }
-        
-        
     });
     
     socket.on("IMoved", function (data) {
         tanks[data.id] = data;
-        socket.broadcast.emit("AnotherTankMoved", data);
-        
+        socket.broadcast.emit("AnotherTankMoved", data);        
     });
 
     socket.on("IGoAway", function (data) {
