@@ -45,10 +45,8 @@ function connectToServer() {
             delete enemies[data.id];        
         });
 
-        socket.on("AnotherBalloonLaunched", function (data) { 
-            var tank = enemies[data.id];
-            //tank.setState(data);      
-            tank.fire();
+        socket.on("AnotherBalloonLaunched", function (positionPrimitives) { 
+            enemyFire(positionPrimitives);
         });
 
     });
@@ -209,10 +207,8 @@ function createTank(scene, data) {
     tank.canFire = true;
     tank.fire = function()
     {
-        //var notifyServer = false;
-        var notifyServer = true;
         var tank = this;
-        //if (!isBPressed) return;
+        if (!isBPressed) return;
         if (!tank.canFire) return;
         tank.canFire = false;
 
@@ -234,19 +230,31 @@ function createTank(scene, data) {
         setTimeout(function () {            
             cannonBall.dispose();
         }, 3000);
-            
-        if (notifyServer) {
-            tank.state.x = tank.position.x;
-            tank.state.y = tank.position.y;
-            tank.state.z = tank.position.z;
-            tank.state.rX = tank.rotation.x;
-            tank.state.rY = tank.rotation.y;
-            tank.state.rZ = tank.rotation.z;
-            socket.emit("ILaunchedBalloon", tank.state);
-        }
+        
+        var positionPrimitives = [tank.position.x, tank.position.y, tank.position.z, tank.frontVector.x, tank.frontVector.y, tank.frontVector.z]; 
+        socket.emit("ILaunchedBalloon", positionPrimitives);
     }
     
     return tank;
+}
+
+
+function enemyFire(positionPrimitives)
+{
+    enemyFrontVector = new BABYLON.Vector3((positionPrimitives[3], positionPrimitives[4], positionPrimitives[5]);
+    var cannonBall = new BABYLON.Mesh.CreateSphere("cannonBall", 32, 2, scene);
+    cannonBall.material = new BABYLON.StandardMaterial("Fire", scene);
+    cannonBall.material.diffuseTexture = new BABYLON.Texture("images/normal_map.jpg", scene);
+    cannonBall.position = new BABYLON.Vector3(positionPrimitives[0], positionPrimitives[1] + 1, positionPrimitives[2]);
+    cannonBall.position.addInPlace(enemyFrontVector.multiplyByFloats(5, 5, 5));
+    cannonBall.physicsImpostor = new BABYLON.PhysicsImpostor(cannonBall, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1 }, scene);
+    var fVector = enemyFrontVector;
+    var force = new BABYLON.Vector3(fVector.x * 100 , (fVector.y+ .1) * 100 , fVector.z * 100);
+    cannonBall.physicsImpostor.applyImpulse(force, cannonBall.getAbsolutePosition());
+
+    setTimeout(function () {            
+        cannonBall.dispose();
+    }, 3000);
 }
 
 window.addEventListener("resize", function () {
