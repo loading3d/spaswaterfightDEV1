@@ -47,7 +47,7 @@ function connectToServer() {
 
         socket.on("AnotherBalloonLaunched", function (data) {            
             var tank = enemies[data.id];
-            tank.enemyFire();      
+            enemyFire(tank);      
         });
 
     });
@@ -171,8 +171,8 @@ function createTank(scene, data) {
         var notifyServer = false;
         var yMovement = 0;
         if (tank.position.y > 2) {
-        tank.moveWithCollisions(new BABYLON.Vector3(0, -2, 0));
-        notifyServer = true;
+            tank.moveWithCollisions(new BABYLON.Vector3(0, -2, 0));
+            notifyServer = true;
         }
         
         if (isWPressed) {
@@ -240,8 +240,8 @@ function createTank(scene, data) {
         tank.state.rZ = tank.rotation.z;
         socket.emit("ILaunchedBalloon", tank.state);
     }
-    
-    tank.enemyFire = function()
+    /*
+    tank.enemyFire = function(enemyTank)
     {
         var tank = this;
         //if (!isBPressed) return;
@@ -267,7 +267,27 @@ function createTank(scene, data) {
             cannonBall.dispose();
         }, 3000);
     }
+    */
     return tank;
+}
+
+function enemyFire(enemyTank)
+{
+    var tank = enemyTank;
+    var cannonBall = new BABYLON.Mesh.CreateSphere("cannonBall", 32, 2, scene);
+    cannonBall.material = new BABYLON.StandardMaterial("Fire", scene);
+    cannonBall.material.diffuseTexture = new BABYLON.Texture("images/normal_map.jpg", scene);
+    var pos = tank.position;
+    cannonBall.position = new BABYLON.Vector3(pos.x, pos.y + 1, pos.z);
+    cannonBall.position.addInPlace(tank.frontVector.multiplyByFloats(5, 5, 5));
+    cannonBall.physicsImpostor = new BABYLON.PhysicsImpostor(cannonBall, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1 }, scene);
+    var fVector = tank.frontVector;
+    var force = new BABYLON.Vector3(fVector.x * 100 , (fVector.y+ .1) * 100 , fVector.z * 100);
+    cannonBall.physicsImpostor.applyImpulse(force, cannonBall.getAbsolutePosition());
+
+    setTimeout(function () {            
+        cannonBall.dispose();
+    }, 3000);
 }
 
 window.addEventListener("resize", function () {
