@@ -241,7 +241,7 @@ function createTank(scene, data) {
 
 function enemyFire(positionPrimitives)
 {
-    enemyFrontVector = new BABYLON.Vector3((positionPrimitives[3], positionPrimitives[4], positionPrimitives[5]);
+    enemyFrontVector = new BABYLON.Vector3(positionPrimitives[3], positionPrimitives[4], positionPrimitives[5]);
     var cannonBall = new BABYLON.Mesh.CreateSphere("cannonBall", 32, 2, scene);
     cannonBall.material = new BABYLON.StandardMaterial("Fire", scene);
     cannonBall.material.diffuseTexture = new BABYLON.Texture("images/normal_map.jpg", scene);
