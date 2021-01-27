@@ -209,10 +209,11 @@ function createTank(scene, data) {
     tank.canFire = true;
     tank.fire = function()
     {
-        var notifyServer = false;
+        //var notifyServer = false;
+        var notifyServer = true;
         var tank = this;
         //if (!isBPressed) return;
-        //if (!tank.canFire) return;
+        if (!tank.canFire) return;
         tank.canFire = false;
 
         setTimeout(function () {
