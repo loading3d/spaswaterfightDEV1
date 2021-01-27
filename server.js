@@ -47,6 +47,10 @@ io.on("connection", function (socket) {
         delete tanks[socket.id];
         socket.broadcast.emit("AnotherWentAway", { id : socket.id });
     });
+    
+    socket.on("ILaunchedBalloon", function (data) {
+        socket.broadcast.emit("AnotherBalloonLaunched", data);        
+    });
 
 });
 
