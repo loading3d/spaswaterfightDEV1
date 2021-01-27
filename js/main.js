@@ -1,4 +1,4 @@
-﻿/// <reference path="js/babylon.max.js" />
+/// <reference path="js/babylon.max.js" />
 /// <reference path="js/socket.js" />
 var canvas;
 var engine;
@@ -211,7 +211,7 @@ function createTank(scene, data) {
     {
         var notifyServer = false;
         var tank = this;
-        if (!isBPressed) return;
+        //if (!isBPressed) return;
         if (!tank.canFire) return;
         tank.canFire = false;
 
