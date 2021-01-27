@@ -48,9 +48,8 @@ io.on("connection", function (socket) {
         socket.broadcast.emit("AnotherWentAway", { id : socket.id });
     });
     
-    socket.on("ILaunchedBalloon", function (data) {
-        tanks[data.id] = data;
-        socket.broadcast.emit("AnotherBalloonLaunched", data);        
+    socket.on("ILaunchedBalloon", function (positionPrimitives) {
+        socket.broadcast.emit("AnotherBalloonLaunched", positionPrimitives);        
     });
 
 });
