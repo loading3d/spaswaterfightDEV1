@@ -47,7 +47,7 @@ function connectToServer() {
 
         socket.on("AnotherBalloonLaunched", function (data) { 
             var tank = enemies[data.id];
-            tank.setState(data);      
+            //tank.setState(data);      
             tank.fire();
         });
 
